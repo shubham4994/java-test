@@ -1,14 +1,19 @@
-pipeline {
+#!/usr/bin/env groovy
+ pipeline {
     agent any
 
     environment {
-        function_name = 'java-sample'
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION = "us-east-1"
+        
+        // function_name = 'java-sample'
     }
 
     stages {
         stage('Build') {
             steps {
-                echo 'Build'
+                echo 'Building...'
                 sh 'mvn package'
             }
         }
