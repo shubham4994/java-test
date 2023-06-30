@@ -23,7 +23,28 @@
                 withSonarQubeEnv('Sonar-test'){
                     sh 'mvn sonar:sonar'
                 }            }
+        stage('Quality gate') {
+            steps {
+            timeout(time:2, unit: 'MINUTES')
+               waitforQualitygate abortPipeline: true 
+            }
         }
+        }
+        
+        stage('Deployment') {
+            parallel{
+                stage('UAT Deployment'){
+                    steps{
+                        echo 'Deployment to UAT'
+                    }
+                }
+            
+                stage('Test Deployment'){
+                    steps{
+                        echo 'Deployment to test'
+                    }
+                }
+            }
         stage('Push') {
             steps {
                 echo 'Push'
