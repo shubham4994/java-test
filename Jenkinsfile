@@ -33,14 +33,20 @@ pipeline {
         
         stage('Quality Gate') {
             steps {
-                scripts{
-                   try {
-                    timeout(time: 2, unit: 'MINUTES') {
+                timeout(time: 2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
+                }
+            }
+            post {
+                always {
+                    script {
+                        try {
+                            // Add your desired step or command here
+                            echo 'Quality Gate succeeded'
+                        } catch (Exception e) {
+                            // Handle any exceptions
+                            echo "Quality Gate failed: ${e.getMessage()}"
                         }
-                   }
-                catch(Exception e){
-
                     }
                 }
             }
