@@ -33,15 +33,17 @@ pipeline {
         
         stage('Quality Gate') {
             steps {
-                try {
+                scripts{
+                   try {
                     timeout(time: 2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
+                        }
+                   }
+                catch(Exception e){
+
+                    }
                 }
             }
-         catch(Exception e){
-
-        }
-        }
         }
         
         stage('Deployment') {
