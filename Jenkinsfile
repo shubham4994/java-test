@@ -1,5 +1,4 @@
-#!/usr/bin/env groovy
- pipeline {
+pipeline {
     agent any
 
     environment {
@@ -17,54 +16,55 @@
                 sh 'mvn package'
             }
         }
-
-        stage('sonarqube analysis'){
-            agent any
+        
+        stage('sonarqube analysis') {
             when {
-                anyof {
+                anyOf {
                     branch 'feature/*'
                     branch 'main'
                 }
             }
             steps {
-                withSonarQubeEnv('Sonar-test'){
+                withSonarQubeEnv('Sonar-test') {
                     sh 'mvn sonar:sonar'
-                }            }
-        stage('Quality gate') {
-            steps {
-            timeout(time:2, unit: 'MINUTES')
-               waitforQualitygate abortPipeline: true 
+                }
             }
         }
+        
+        stage('Quality gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
         
         stage('Deployment') {
-            parallel{
-                stage('Test'){
-                    steps{
+            parallel {
+                stage('Test') {
+                    steps {
                         echo 'Deployment to Test'
                     }
                 }
             
-                stage('UAT Deployment'){
-                    steps{
+                stage('UAT Deployment') {
+                    steps {
                         echo 'Deployment to UAT'
                     }
                 }
             }
+        }
+        
         stage('Push') {
-        agent any
             when {
-                anyof {
+                anyOf {
                     branch 'main'
                 }
             }
             steps {
                 echo 'Push'
-
                 sh "aws s3 cp target/sample-1.0.3.jar s3://angular-ui-sj"
-                }
             }
         }
     }
- }
+}
