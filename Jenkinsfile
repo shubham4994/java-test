@@ -19,6 +19,13 @@
         }
 
         stage('sonarqube analysis'){
+            agent any
+            when {
+                anyof {
+                    branch 'feature/*'
+                    branch 'main'
+                }
+            }
             steps {
                 withSonarQubeEnv('Sonar-test'){
                     sh 'mvn sonar:sonar'
@@ -33,19 +40,25 @@
         
         stage('Deployment') {
             parallel{
+                stage('Test'){
+                    steps{
+                        echo 'Deployment to Test'
+                    }
+                }
+            
                 stage('UAT Deployment'){
                     steps{
                         echo 'Deployment to UAT'
                     }
                 }
-            
-                stage('Test Deployment'){
-                    steps{
-                        echo 'Deployment to test'
-                    }
-                }
             }
         stage('Push') {
+        agent any
+            when {
+                anyof {
+                    branch 'main'
+                }
+            }
             steps {
                 echo 'Push'
 
